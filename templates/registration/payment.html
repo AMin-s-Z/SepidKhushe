@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}سپید خوشه نقش جهان - در حال اتصال به درگاه پرداخت{% endblock %}
+
+{% block extra_css %}
+{# A small block for custom animations if your base.html supports it #}
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-card {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .dot-flashing {
+        position: relative;
+        width: 10px;
+        height: 10px;
+        border-radius: 5px;
+        background-color: #10B981; /* green-500 */
+        color: #10B981;
+        animation: dotFlashing 1s infinite linear alternate;
+        animation-delay: .5s;
+    }
+
+    .dot-flashing::before, .dot-flashing::after {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        top: 0;
+    }
+
+    .dot-flashing::before {
+        left: -15px;
+        width: 10px;
+        height: 10px;
+        border-radius: 5px;
+        background-color: #10B981;
+        color: #10B981;
+        animation: dotFlashing 1s infinite alternate;
+        animation-delay: 0s;
+    }
+
+    .dot-flashing::after {
+        left: 15px;
+        width: 10px;
+        height: 10px;
+        border-radius: 5px;
+        background-color: #10B981;
+        color: #10B981;
+        animation: dotFlashing 1s infinite alternate;
+        animation-delay: 1s;
+    }
+
+    @keyframes dotFlashing {
+        0% { background-color: #10B981; }
+        50%, 100% { background-color: #D1FAE5; } /* green-100 */
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-lg mx-auto bg-white shadow-xl rounded-2xl overflow-hidden fade-in-card">
+
+        <div class="p-8 border-b border-gray-200">
+            <div class="flex flex-col items-center text-center">
+                <div class="w-16 h-16 mb-4 flex items-center justify-center bg-green-100 rounded-full">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">در حال انتقال به درگاه پرداخت امن</h1>
+                <p class="text-gray-500 mt-2">لطفاً چند لحظه صبر کنید. ما در حال آماده‌سازی صفحه پرداخت برای شما هستیم.</p>
+            </div>
+        </div>
+
+        <div class="p-8">
+            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">خلاصه پرداخت</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">نام پرداخت کننده:</span>
+                        <span class="font-medium text-gray-900">{{ registration.name }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">بابت:</span>
+                        <span class="font-medium text-gray-900">{{ registration.get_payment_type_display }}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-3 border-t mt-3">
+                        <span class="text-base font-semibold text-gray-600">مبلغ نهایی:</span>
+                        <span class="text-xl font-bold text-green-600">{{ registration.amount|floatformat:0 }} تومان</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center my-8">
+                <div class="dot-flashing mb-5"></div>
+                <p class="text-sm text-gray-500">در حال برقراری ارتباط با زرین‌پال...</p>
+            </div>
+
+            <div class="text-center">
+                <p class="text-xs text-gray-400 mb-4">
+                    انتقال خودکار تا چند ثانیه دیگر انجام می‌شود. اگر منتقل نشدید، روی دکمه زیر کلیک کنید.
+                </p>
+                <a href="#" id="manual-redirect" class="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-transform transform hover:scale-105">
+                    <i class="fas fa-external-link-alt ml-2"></i>
+                    رفتن به صفحه پرداخت
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center mt-8">
+        <p class="text-sm text-gray-500">امنیت پرداخت شما توسط زرین‌پال تضمین می‌شود.</p>
+    </footer>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentUrl = "{{ payment_url|escapejs }}";
+
+        // Automatic redirect after 4 seconds for a smoother experience
+        const autoRedirectTimer = setTimeout(function() {
+            if (paymentUrl) {
+                window.location.href = paymentUrl;
+            }
+        }, 4000);
+
+        // Manual redirect button
+        const manualRedirectButton = document.getElementById('manual-redirect');
+        if (manualRedirectButton) {
+            manualRedirectButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Clear the automatic timer to prevent double redirect
+                clearTimeout(autoRedirectTimer);
+                if (paymentUrl) {
+                    window.location.href = paymentUrl;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

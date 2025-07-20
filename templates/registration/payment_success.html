@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load registration_extras %}
+
+{% block title %}سپید خوشه نقش جهان - پرداخت موفق{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Keyframe animations for the success icon and card fade-in */
+    @keyframes scale-in {
+        from { transform: scale(0.5); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .scale-in-icon {
+        animation: scale-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-receipt {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    /* Print-specific styles for the new layout */
+    @media print {
+        body {
+            background-color: #fff !important;
+        }
+        .no-print, header, footer, .print-hide {
+            display: none !important;
+        }
+        .print-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-shadow: none !important;
+            border: 1px solid #eee;
+        }
+        .print-text-black {
+            color: #000 !important;
+        }
+        .print-bg-white {
+            background-color: #fff !important;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4 py-12">
+    <div class="w-full max-w-3xl mx-auto bg-white shadow-xl rounded-2xl print-container fade-in-receipt">
+
+        <div class="p-8 text-center border-b-2 border-dashed border-gray-200">
+            <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center scale-in-icon">
+                <i class="fas fa-check text-green-600 text-4xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mt-6 print-text-black">پرداخت موفقیت آمیز بود</h1>
+            <p class="text-gray-500 mt-2">از ثبت نام شما در دوره آموزش پرورش قارچ سپاسگزاریم.</p>
+        </div>
+
+        <div class="p-8">
+
+            <div class="text-center mb-8">
+                <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider">کد پیگیری ثبت نام</h3>
+                <div class="mt-2 inline-block bg-green-50 text-green-800 font-mono text-2xl font-bold py-3 px-6 rounded-lg border border-green-200">
+                    {{ registration.tracking_code }}
+                </div>
+                <p class="text-xs text-gray-400 mt-2">برای پیگیری‌های بعدی، این کد را نزد خود نگه دارید.</p>
+            </div>
+
+            <div class="bg-gray-50/70 p-6 rounded-lg border border-gray-200/80">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">جزئیات ثبت نام</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                    <div class="flex justify-between py-2 border-b">
+                        <span class="text-gray-600">نام و نام خانوادگی:</span>
+                        <span class="font-medium text-gray-900">{{ registration.name }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b">
+                        <span class="text-gray-600">شماره تماس:</span>
+                        <span class="font-medium text-gray-900 ltr">{{ registration.phone }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b">
+                        <span class="text-gray-600">تاریخ ثبت نام:</span>
+                        <span class="font-medium text-gray-900 ltr">{{ registration.created_at|date:"Y/m/d H:i" }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b">
+                        <span class="text-gray-600">نوع ثبت نام:</span>
+                        <span class="font-medium text-gray-900">{{ registration.get_payment_type_display }}</span>
+                    </div>
+                     <div class="flex justify-between py-2 border-b sm:border-b-0">
+                        <span class="text-gray-600">شناسه پرداخت:</span>
+                        <span class="font-medium text-gray-900 ltr">{{ payment.ref_id }}</span>
+                    </div>
+                    <div class="flex justify-between py-2">
+                        <span class="text-gray-600">مبلغ کل پرداختی:</span>
+                        <span class="font-bold text-green-600">{{ registration.amount|floatformat:0 }} تومان</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if registration.payment_type == 'installment' %}
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">وضعیت اقساط</h3>
+                <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-right font-medium text-gray-600">قسط</th>
+                                <th class="px-4 py-3 text-right font-medium text-gray-600">مبلغ</th>
+                                <th class="px-4 py-3 text-right font-medium text-gray-600">تاریخ سررسید</th>
+                                <th class="px-4 py-3 text-center font-medium text-gray-600">وضعیت</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {# Note: This is hardcoded, replace with your dynamic loop #}
+                            <tr>
+                                <td class="px-4 py-3">قسط اول</td>
+                                <td class="px-4 py-3">۵۰۰,۰۰۰ تومان</td>
+                                <td class="px-4 py-3 ltr">{{ registration.created_at|date:"Y/m/d" }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">پرداخت شده</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3">قسط دوم</td>
+                                <td class="px-4 py-3">۵۰۰,۰۰۰ تومان</td>
+                                <td class="px-4 py-3 ltr">{{ registration.created_at|date:"Y/m/d"|add_months:1 }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">در انتظار پرداخت</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3">قسط سوم</td>
+                                <td class="px-4 py-3">۵۰۰,۰۰۰ تومان</td>
+                                <td class="px-4 py-3 ltr">{{ registration.created_at|date:"Y/m/d"|add_months:2 }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold">آینده</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 bg-blue-50 text-blue-800 p-3 rounded-lg text-sm flex items-center">
+                    <i class="fas fa-info-circle ml-2 flex-shrink-0"></i>
+                    <span>لینک پرداخت اقساط بعدی در موعد مقرر به شماره همراه شما پیامک خواهد شد.</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">مراحل بعدی</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 ml-3 mt-1"></i>
+                        <div>
+                            <span class="font-semibold">تاییدیه پیامکی: </span>
+                            <span>رسید پرداخت و کد پیگیری به شماره همراه شما ارسال گردید.</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-clock text-blue-500 ml-3 mt-1"></i>
+                        <div>
+                            <span class="font-semibold">اطلاع‌رسانی دوره: </span>
+                            <span>زمان‌بندی و جزئیات کلاس‌ها به زودی برای شما ارسال می‌شود.</span>
+                        </div>
+                    </li>
+                     <li class="flex items-start">
+                        <i class="fas fa-headset text-blue-500 ml-3 mt-1"></i>
+                        <div>
+                            <span class="font-semibold">پشتیبانی: </span>
+                            <span>برای راهنمایی بیشتر با شماره ۰۲۱-۱۲۳۴۵۶۷۸ تماس بگیرید.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="p-6 bg-gray-50 text-center space-x-4 rtl:space-x-reverse print-hide rounded-b-2xl">
+            <a href="{% url 'home' %}" class="px-6 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition">بازگشت به سایت</a>
+            <a href="{% url 'track' %}" class="px-6 py-2.5 rounded-lg bg-white text-gray-700 font-medium border border-gray-300 hover:bg-gray-100 transition">پیگیری ثبت نام</a>
+            <button onclick="window.print()" class="px-6 py-2.5 rounded-lg bg-white text-gray-700 font-medium border border-gray-300 hover:bg-gray-100 transition">
+                <i class="fas fa-print ml-2"></i>چاپ رسید
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

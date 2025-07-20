@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}سپید خوشه نقش جهان - ثبت نام دوره آموزش پرورش قارچ{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* * A simple, clean, and light background for better focus.
+     * The pattern has been removed as requested.
+     */
+    body {
+        background-color: #f8fafc; /* bg-slate-50 */
+    }
+
+    /*
+     * Custom properties for brand colors to maintain consistency.
+     */
+    :root {
+        --brand-primary: #10B981; /* green-500 */
+        --brand-dark: #047857;    /* green-700 */
+        --brand-light: #d1fae5;   /* green-100 */
+        --brand-text: #064e3b;   /* green-900 */
+    }
+
+    /* --- Form Container & Header --- */
+    .form-container {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 1) 100%);
+        backdrop-filter: blur(10px);
+        border-radius: 1.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb; /* gray-200 */
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-dark) 100%);
+        padding: 2rem;
+    }
+
+    /* --- Step Progress Bar --- */
+    .form-steps { display: flex; position: relative; }
+    .form-steps::before { content: ''; position: absolute; top: 1rem; right: 0; left: 0; height: 4px; background-color: #e5e7eb; transform: translateY(-50%); z-index: 0; }
+    .form-steps .progress-line { position: absolute; top: 1rem; right: 0; height: 4px; width: 0%; background: var(--brand-primary); z-index: 1; transform: translateY(-50%); transition: width 0.5s ease-in-out; }
+    .form-step { flex: 1; text-align: center; position: relative; z-index: 2; }
+    .form-step-circle { width: 2rem; height: 2rem; border: 4px solid #f8fafc; background-color: #e5e7eb; color: #9ca3af; transition: all 0.4s ease; }
+    .form-step.active .form-step-circle { background-color: var(--brand-primary); border-color: var(--brand-light); color: white; transform: scale(1.1); }
+    .form-step.completed .form-step-circle { background-color: var(--brand-primary); border-color: var(--brand-primary); color: white; }
+    .form-step .form-step-text { transition: all 0.4s ease; }
+    .form-step.active .form-step-text { color: var(--brand-primary); font-weight: 700; }
+    .form-step.completed .form-step-text { font-weight: 500; }
+
+    /* --- Step Content Animation --- */
+    .form-step-content { display: none; }
+    .form-step-content.active { display: block; animation: fadeIn 0.6s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- Payment Options --- */
+    .payment-option { border: 2px solid #e5e7eb; transition: all 0.3s ease; }
+    .payment-option:hover { border-color: #a7f3d0; transform: translateY(-2px); }
+    .payment-option.selected { border-color: var(--brand-primary); background-color: rgba(16, 185, 129, 0.05); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); transform: scale(1.02); }
+    .radio-circle { border: 2px solid #d1d5db; transition: all 0.3s ease; }
+    .payment-option.selected .radio-circle { border-color: var(--brand-primary); }
+    .radio-circle::after { content: ''; width: 12px; height: 12px; background-color: var(--brand-primary); transform: scale(0); transition: all 0.3s ease; }
+    .payment-option.selected .radio-circle::after { transform: scale(1); }
+
+    /* --- Installment Details Animation --- */
+    .installment-info { max-height: 0; overflow: hidden; transition: max-height 0.6s ease-in-out, margin-top 0.6s ease-in-out; }
+    .installment-info.show { max-height: 600px; margin-top: 1rem; }
+
+    /* --- Floating Label Inputs (Refined) & Inline Errors --- */
+    .floating-label-group { position: relative; }
+    .form-input { height: 3.5rem; padding: 1.25rem 1rem 0.5rem 3rem; border-width: 2px; border-color: #e5e7eb; transition: border-color 0.2s ease; }
+    .form-input:focus { outline: none; border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+    .form-label { position: absolute; top: 1rem; right: 1rem; color: #6b7280; pointer-events: none; transition: all 0.2s ease; background-color: white; padding: 0 0.25rem; }
+    .form-input:focus + .form-label, .form-input:not(:placeholder-shown) + .form-label { top: -0.6rem; font-size: 0.8rem; color: var(--brand-primary); }
+    .input-icon { position: absolute; top: 50%; left: 1rem; transform: translateY(-50%); color: #9ca3af; transition: color 0.2s ease; }
+    .form-input:focus ~ .input-icon { color: var(--brand-primary); }
+    .error-message { color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem; display: none; }
+    .form-input.is-invalid { border-color: #ef4444; }
+    .form-input.is-invalid:focus { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
+    .form-input.is-invalid + .form-label { color: #ef4444; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-12 px-4">
+    <div id="form-steps-container" class="form-steps mb-8">
+        <div class="progress-line"></div>
+        <div id="step-indicator-1" class="form-step active"><div class="form-step-circle rounded-full flex items-center justify-center mx-auto font-bold">1</div><p class="form-step-text mt-2 text-sm">اطلاعات شخصی</p></div>
+        <div id="step-indicator-2" class="form-step"><div class="form-step-circle rounded-full flex items-center justify-center mx-auto font-bold">2</div><p class="form-step-text mt-2 text-sm text-gray-500">نحوه پرداخت</p></div>
+        <div id="step-indicator-3" class="form-step"><div class="form-step-circle rounded-full flex items-center justify-center mx-auto font-bold">3</div><p class="form-step-text mt-2 text-sm text-gray-500">تایید و پرداخت</p></div>
+    </div>
+
+    <div class="form-container">
+        <div class="form-header text-center">
+            <div class="inline-block bg-white/20 p-4 rounded-full mb-4"><i class="fas fa-user-plus text-4xl text-white"></i></div>
+            <h2 class="text-2xl md:text-3xl font-bold text-white">ثبت نام در دوره آموزش پرورش قارچ</h2>
+            <p class="text-green-200 mt-2">شرکت سپید خوشه نقش جهان</p>
+        </div>
+
+        <form id="registration-form" method="post" action="{% url 'register' %}" class="p-6 md:p-10">
+            {% csrf_token %}
+
+            <div id="step-1" class="form-step-content active">
+                <fieldset>
+                    <legend class="text-xl font-bold text-green-800 mb-6 flex items-center"><i class="fas fa-id-card text-green-500 text-2xl mr-3"></i>اطلاعات شخصی</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+                        <div>
+                            <div class="floating-label-group">
+                                <input type="text" id="id_name" name="name" class="form-input w-full rounded-lg bg-white" placeholder=" " required>
+                                <label for="id_name" class="form-label">نام و نام خانوادگی</label>
+                                <span class="input-icon"><i class="fas fa-user"></i></span>
+                            </div>
+                            <p id="error-name" class="error-message">این فیلد الزامی است.</p>
+                        </div>
+                        <div>
+                            <div class="floating-label-group">
+                                <input type="tel" id="id_phone" name="phone" class="form-input w-full rounded-lg bg-white" placeholder=" " required>
+                                <label for="id_phone" class="form-label">شماره تماس (مثال: 09123456789)</label>
+                                <span class="input-icon"><i class="fas fa-phone"></i></span>
+                            </div>
+                            <p id="error-phone" class="error-message">لطفا یک شماره تماس معتبر وارد کنید.</p>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div id="step-2" class="form-step-content">
+                <fieldset>
+                    <legend class="text-xl font-bold text-green-800 mb-6 flex items-center"><i class="fas fa-credit-card text-green-500 text-2xl mr-3"></i>نحوه پرداخت</legend>
+                    <div id="payment-options-container" class="space-y-4">
+                        <label class="payment-option flex items-start p-5 rounded-xl cursor-pointer" id="cash-option"><div class="radio-circle w-6 h-6 rounded-full flex-shrink-0 mt-1 mr-4 flex items-center justify-center"></div><div class="flex-1"><div class="flex justify-between items-center"><h4 class="font-bold text-lg text-gray-800">پرداخت نقدی با تخفیف</h4><div class="text-xl font-extrabold text-green-600">۴,۰۵۰,۰۰۰ <span class="text-sm font-normal">تومان</span></div></div><p class="text-sm text-gray-600 mt-1">با پرداخت نقدی از <span class="font-bold text-green-600">۱۰٪ تخفیف</span> بهره‌مند شوید.</p></div><input type="radio" name="payment_type" value="cash" class="hidden"></label>
+                        <label class="payment-option flex flex-col p-5 rounded-xl cursor-pointer" id="installment-option"><div class="flex items-start w-full"><div class="radio-circle w-6 h-6 rounded-full flex-shrink-0 mt-1 mr-4 flex items-center justify-center"></div><div class="flex-1"><div class="flex justify-between items-center"><h4 class="font-bold text-lg text-gray-800">پرداخت اقساطی</h4><div class="text-xl font-extrabold text-green-600">۴,۵۰۰,۰۰۰ <span class="text-sm font-normal">تومان</span></div></div><p class="text-sm text-gray-600 mt-1">پیش‌پرداخت و دو قسط ماهانه.</p></div><input type="radio" name="payment_type" value="installment" class="hidden"></div><div id="installment-info" class="installment-info w-full"><div class="bg-green-50 border border-green-200 p-4 rounded-lg"><table class="w-full text-right text-sm"><thead><tr><th class="p-2 font-semibold">قسط</th><th class="p-2 font-semibold">مبلغ</th><th class="p-2 font-semibold">زمان پرداخت</th></tr></thead><tbody class="text-gray-700"><tr class="border-t border-green-200"><td class="p-2">پیش پرداخت</td><td class="p-2">۱,۵۰۰,۰۰۰ تومان</td><td class="p-2">هنگام ثبت نام</td></tr><tr class="border-t border-green-200"><td class="p-2">قسط دوم</td><td class="p-2">۱,۵۰۰,۰۰۰ تومان</td><td class="p-2">یک ماه بعد با ضمانت چک صیادی</td></tr><tr class="border-t border-green-200"><td class="p-2">قسط سوم</td><td class="p-2">۱,۵۰۰,۰۰۰ تومان</td><td class="p-2">دو ماه بعد با ضمانت چک صیادی دیگر</td></tr></tbody></table></div></div></label>
+                    </div>
+                    <p id="error-payment_type" class="error-message">لطفا یک روش پرداخت را انتخاب کنید.</p>
+                </fieldset>
+            </div>
+
+            <div id="step-3" class="form-step-content">
+                <fieldset>
+                    <legend class="text-xl font-bold text-green-800 mb-6 flex items-center"><i class="fas fa-check-circle text-green-500 text-2xl mr-3"></i>تایید نهایی اطلاعات</legend>
+                    <div class="bg-green-50 border border-green-200 p-6 rounded-2xl space-y-4">
+                        <div class="flex justify-between items-center pb-2 border-b border-green-200"><span class="text-gray-600">نام و نام خانوادگی:</span><span id="summary-name" class="font-bold text-gray-800"></span></div>
+                        <div class="flex justify-between items-center pb-2 border-b border-green-200"><span class="text-gray-600">شماره تماس:</span><span id="summary-phone" class="font-bold text-gray-800"></span></div>
+                        <div class="flex justify-between items-center pb-2 border-b border-green-200"><span class="text-gray-600">نحوه پرداخت:</span><span id="summary-payment_type" class="font-bold text-gray-800"></span></div>
+                        <div class="flex justify-between items-center text-lg"><span class="font-semibold text-green-800">مبلغ قابل پرداخت:</span><span id="summary-amount" class="font-extrabold text-green-600"></span></div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="flex justify-between items-center mt-12">
+                <button type="button" id="prev-btn" class="btn btn-secondary invisible">
+                    <i class="fas fa-arrow-right ml-2"></i>مرحله قبل
+                </button>
+                <button type="button" id="next-btn" class="btn btn-primary">
+                    مرحله بعد<i class="fas fa-arrow-left mr-2"></i>
+                </button>
+                <button type="submit" id="submit-btn" class="btn btn-primary hidden">
+                    تایید و پرداخت<i class="fas fa-credit-card mr-2"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- State Management ---
+    let currentStep = 1;
+    const totalSteps = 3;
+    const form = document.getElementById('registration-form');
+
+    // --- DOM Elements ---
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const paymentOptionsContainer = document.getElementById('payment-options-container');
+    const installmentInfo = document.getElementById('installment-info');
+
+    // --- Event Listeners ---
+    nextBtn.addEventListener('click', () => {
+        if (validateStep(currentStep)) {
+            currentStep++;
+            updateFormState();
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        currentStep--;
+        updateFormState();
+    });
+
+    paymentOptionsContainer.addEventListener('click', (e) => {
+        const target = e.target.closest('.payment-option');
+        if (!target) return;
+
+        document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+        target.classList.add('selected');
+        target.querySelector('input[type="radio"]').checked = true;
+
+        installmentInfo.classList.toggle('show', target.id === 'installment-option');
+        clearError('payment_type'); // Clear error on selection
+    });
+
+    // --- Functions ---
+    function updateFormState() {
+        // Update Step Content Visibility
+        document.querySelectorAll('.form-step-content').forEach((stepEl, index) => {
+            stepEl.classList.toggle('active', (index + 1) === currentStep);
+        });
+
+        // Update Progress Bar
+        const progressLine = document.querySelector('.form-steps .progress-line');
+        progressLine.style.width = `${((currentStep - 1) / (totalSteps - 1)) * 100}%`;
+
+        document.querySelectorAll('.form-step').forEach((stepIndicator, index) => {
+            const stepNum = index + 1;
+            stepIndicator.classList.toggle('active', stepNum === currentStep);
+            stepIndicator.classList.toggle('completed', stepNum < currentStep);
+        });
+
+        // Update Button Visibility
+        prevBtn.classList.toggle('invisible', currentStep === 1);
+        nextBtn.classList.toggle('hidden', currentStep === totalSteps);
+        submitBtn.classList.toggle('hidden', currentStep !== totalSteps);
+
+        // Populate summary on the last step
+        if (currentStep === totalSteps) {
+            populateSummary();
+        }
+    }
+
+    function validateStep(step) {
+        clearAllErrors();
+        let isValid = true;
+
+        if (step === 1) {
+            const name = form.elements.name;
+            const phone = form.elements.phone;
+            if (name.value.trim() === '') {
+                showError('name', 'نام و نام خانوادگی نمی‌تواند خالی باشد.');
+                isValid = false;
+            }
+            const phoneRegex = /^09\d{9}$/;
+            if (!phoneRegex.test(phone.value)) {
+                showError('phone', 'لطفا یک شماره تماس معتبر با فرمت 09123456789 وارد کنید.');
+                isValid = false;
+            }
+        }
+
+        if (step === 2) {
+            const paymentType = form.elements.payment_type.value;
+            if (paymentType === '') {
+                showError('payment_type', 'لطفا یک روش پرداخت را انتخاب کنید.');
+                isValid = false;
+            }
+        }
+
+        return isValid;
+    }
+
+    function showError(field, message) {
+        const inputEl = document.getElementById(`id_${field}`);
+        const errorEl = document.getElementById(`error-${field}`);
+        if (inputEl) inputEl.classList.add('is-invalid');
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+    }
+
+    function clearError(field) {
+        const inputEl = document.getElementById(`id_${field}`);
+        const errorEl = document.getElementById(`error-${field}`);
+        if (inputEl) inputEl.classList.remove('is-invalid');
+        if (errorEl) errorEl.style.display = 'none';
+    }
+
+    function clearAllErrors() {
+        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.form-input').forEach(el => el.classList.remove('is-invalid'));
+    }
+
+    function populateSummary() {
+        document.getElementById('summary-name').textContent = form.elements.name.value;
+        document.getElementById('summary-phone').textContent = form.elements.phone.value;
+
+        const paymentType = form.elements.payment_type.value;
+        if (paymentType === 'cash') {
+            document.getElementById('summary-payment_type').textContent = 'نقدی با تخفیف';
+            document.getElementById('summary-amount').innerHTML = '۱,۲۰۰,۰۰۰ <span class="text-sm font-normal">تومان</span>';
+        } else if (paymentType === 'installment') {
+            document.getElementById('summary-payment_type').textContent = 'اقساطی (پیش پرداخت)';
+            document.getElementById('summary-amount').innerHTML = '۵۰۰,۰۰۰ <span class="text-sm font-normal">تومان</span>';
+        }
+    }
+
+    // Initialize the form state
+    updateFormState();
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}پیگیری ثبت نام - سپید خوشه نقش جهان{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f8fafc;
+    }
+
+    /* --- Segmented Control Container --- */
+    .segmented-control {
+        display: flex;
+        background-color: #f1f5f9;
+        border-radius: 0.75rem;
+        padding: 0.25rem;
+    }
+
+    /* --- Styling for each button --- */
+    .segmented-control button {
+        flex: 1;
+        position: relative;
+        padding: 0.75rem 1rem;
+        border: none;
+        background: none;
+        color: #4b5563; /* Default text color */
+        font-weight: 600;
+        cursor: pointer;
+        transition: color 0.3s ease, font-weight 0.3s ease;
+        white-space: nowrap;
+    }
+
+    /* --- Styling for the ACTIVE button --- */
+    .segmented-control button.active {
+        color: #047857; /* Active text color */
+        font-weight: 800; /* Bolder font for the active tab */
+    }
+
+    /* --- Form animation styles --- */
+    .form-content { display: none; }
+    .form-content.active {
+        display: block;
+        animation: slide-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    @keyframes slide-in {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Floating Label Input Styles --- */
+    .floating-label-group { position: relative; }
+    .form-input {
+        height: 3.5rem;
+        padding: 1.25rem 1rem 0.5rem 3rem;
+        border-width: 2px;
+        border-color: #e5e7eb;
+        transition: border-color 0.2s ease;
+        background-color: white;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #10B981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+    .form-label {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        color: #6b7280;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        background-color: white;
+        padding: 0 0.25rem;
+    }
+    .form-input:focus + .form-label,
+    .form-input:not(:placeholder-shown) + .form-label {
+        top: -0.6rem;
+        font-size: 0.8rem;
+        color: #10B981;
+    }
+    .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 1rem;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        transition: color 0.2s ease;
+    }
+    .form-input:focus ~ .input-icon {
+        color: #10B981;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="container mx-auto max-w-4xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200/50">
+            <div class="hidden md:flex flex-col justify-between p-8 bg-gradient-to-br from-green-50 to-emerald-100">
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="bg-gradient-to-br from-green-500 to-emerald-600 p-3 rounded-2xl shadow-lg">
+                            <i class="fas fa-seedling text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-green-900">سپید خوشه</h2>
+                            <p class="text-xs text-green-800">نقش جهان</p>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-green-900 leading-relaxed">سفر شما، برای ما اهمیت دارد.</h3>
+                    <p class="text-green-800/80 mt-4">در این بخش می‌توانید به راحتی وضعیت ثبت نام خود را مشاهده کنید.</p>
+                </div>
+                <div class="text-green-700/60 text-sm mt-10">
+                    &copy; {% now "Y" %} سپید خوشه نقش جهان
+                </div>
+            </div>
+
+            <div class="md:col-span-2 p-8 md:p-12">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-extrabold text-gray-800 mb-2">پیگیری ثبت نام</h1>
+                    <p class="text-gray-500">وضعیت ثبت نام و پرداخت خود را بررسی کنید.</p>
+                </div>
+
+                <div id="tabs-container" class="segmented-control mb-8">
+                    <button data-target="trackingCodeForm" class="active">با کد پیگیری</button>
+                    <button data-target="phoneForm">با شماره تماس</button>
+                </div>
+
+                <div class="relative">
+                    <div id="trackingCodeForm" class="form-content active">
+                        <form action="{% url 'track' %}" method="get" class="space-y-8">
+                            <div class="floating-label-group">
+                                <input type="text" id="tracking_code" name="tracking_code" class="form-input w-full rounded-lg" placeholder=" " required>
+                                <label for="tracking_code" class="form-label">کد پیگیری</label>
+                                <span class="input-icon"><i class="fas fa-barcode"></i></span>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary w-full btn-lg">
+                                    <i class="fas fa-search ml-2"></i>جستجو
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="phoneForm" class="form-content">
+                        <form action="{% url 'track' %}" method="post" class="space-y-8">
+                            {% csrf_token %}
+                            <div class="floating-label-group">
+                                <input type="tel" id="phone" name="phone" class="form-input w-full rounded-lg" placeholder=" " required>
+                                <label for="phone" class="form-label">شماره تماس</label>
+                                <span class="input-icon"><i class="fas fa-mobile-alt"></i></span>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary w-full btn-lg">
+                                    <i class="fas fa-paper-plane ml-2"></i>دریافت کد با پیامک
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center text-sm text-gray-500 mt-10 border-t border-gray-200 pt-6">
+                    <p>کد پیگیری در پیامک تأیید ثبت نام برای شما ارسال شده است.</p>
+                    <p class="mt-2">در صورت عدم دریافت، با شماره تماس خود اقدام کنید.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-8">
+            <a href="{% url 'home' %}" class="text-green-600 hover:text-green-800 font-medium transition-colors duration-300 inline-flex items-center group">
+                <i class="fas fa-arrow-right ml-2 transform transition-transform duration-300 group-hover:-translate-x-1"></i>
+                بازگشت به صفحه اصلی
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabsContainer = document.getElementById('tabs-container');
+        if (!tabsContainer) return;
+
+        const buttons = tabsContainer.querySelectorAll('button');
+        const forms = document.querySelectorAll('.form-content');
+
+        // This function is now much simpler
+        function switchTab(targetButton) {
+            // Update button active states
+            buttons.forEach(btn => btn.classList.remove('active'));
+            targetButton.classList.add('active');
+
+            // Show the correct form
+            const targetFormId = targetButton.dataset.target;
+            forms.forEach(form => {
+                form.classList.toggle('active', form.id === targetFormId);
+            });
+        }
+
+        tabsContainer.addEventListener('click', (e) => {
+            const targetButton = e.target.closest('button');
+            if (targetButton) {
+                switchTab(targetButton);
+            }
+        });
+    });
+</script>
+
+{% endblock %}

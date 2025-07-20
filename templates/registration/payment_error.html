@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}سپید خوشه نقش جهان - خطا در پرداخت{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-lg rounded-2xl overflow-hidden">
+        <!-- Error Header -->
+        <div class="bg-red-600 text-white py-10 px-6 text-center">
+            <div class="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-exclamation-triangle text-red-600 text-5xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold">خطا در اتصال به درگاه پرداخت</h2>
+            <p class="text-red-100 mt-2">متأسفانه در اتصال به درگاه پرداخت خطایی رخ داده است</p>
+        </div>
+        
+        <!-- Error Details -->
+        <div class="px-8 py-10">
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl mb-8">
+                    <h3 class="text-xl font-bold flex items-center mb-4">
+                        <i class="fas fa-exclamation-circle ml-2"></i>
+                        جزئیات خطا
+                    </h3>
+                    <p>در حال حاضر امکان اتصال به درگاه پرداخت وجود ندارد. لطفاً دقایقی دیگر مجدداً تلاش نمایید یا با پشتیبانی تماس بگیرید.</p>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-xl mb-8">
+                    <h3 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-lightbulb ml-2 text-yellow-500"></i>
+                        راهکارهای پیشنهادی
+                    </h3>
+                    
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <div class="bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-gray-700 font-bold ml-3 mt-0.5">1</div>
+                            <span>دقایقی دیگر مجدداً تلاش کنید.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-gray-700 font-bold ml-3 mt-0.5">2</div>
+                            <span>از اتصال اینترنت خود اطمینان حاصل کنید.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-gray-700 font-bold ml-3 mt-0.5">3</div>
+                            <span>با پشتیبانی به شماره ۰۲۱-۱۲۳۴۵۶۷۸ تماس بگیرید.</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="flex justify-center space-x-4 rtl:space-x-reverse">
+                    <a href="{% url 'register' %}" class="bg-blue-500 text-white py-3 px-6 rounded-full hover:bg-blue-600 transition duration-300 flex items-center">
+                        <i class="fas fa-redo ml-2"></i>
+                        تلاش مجدد
+                    </a>
+                    
+                    <a href="{% url 'home' %}" class="bg-gray-500 text-white py-3 px-6 rounded-full hover:bg-gray-600 transition duration-300 flex items-center">
+                        <i class="fas fa-home ml-2"></i>
+                        بازگشت به صفحه اصلی
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,111 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}جزئیات پیام{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">جزئیات پیام</h1>
+        <div class="flex space-x-2 space-x-reverse">
+            <a href="{% url 'dashboard:messages' %}" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                <i class="fas fa-arrow-right ml-2"></i>
+                بازگشت به لیست پیام ها
+            </a>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Message Details -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-lg font-bold text-gray-700 mb-4">اطلاعات پیام</h2>
+                
+                <div class="space-y-6">
+                    <!-- Message Type and Status -->
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="text-sm text-gray-500">نوع پیام:</span>
+                            <span class="mr-2 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">{{ message.get_message_type_display }}</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">وضعیت:</span>
+                            {% if message.status == 'sent' %}
+                            <span class="mr-2 px-2 py-1 bg-green-100 text-green-800 text-sm rounded-full">{{ message.get_status_display }}</span>
+                            {% elif message.status == 'pending' %}
+                            <span class="mr-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">{{ message.get_status_display }}</span>
+                            {% else %}
+                            <span class="mr-2 px-2 py-1 bg-red-100 text-red-800 text-sm rounded-full">{{ message.get_status_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Subject (if email) -->
+                    {% if message.message_type == 'email' and message.subject %}
+                    <div>
+                        <h3 class="text-md font-bold text-gray-700 mb-2">موضوع</h3>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            {{ message.subject }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Message Content -->
+                    <div>
+                        <h3 class="text-md font-bold text-gray-700 mb-2">متن پیام</h3>
+                        <div class="p-4 bg-gray-50 rounded-lg whitespace-pre-wrap">
+                            {{ message.content }}
+                        </div>
+                    </div>
+                    
+                    <!-- Message Info -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-sm text-gray-500">تاریخ ایجاد:</span>
+                            <span class="mr-2 text-gray-700">{{ message.created_at|date:"Y/m/d H:i" }}</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">تاریخ ارسال:</span>
+                            <span class="mr-2 text-gray-700">{{ message.sent_at|date:"Y/m/d H:i"|default:"-" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recipients List -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-700">دریافت کنندگان</h2>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">{{ recipients.count }} نفر</span>
+                </div>
+                
+                <div class="border border-gray-200 rounded-md h-96 overflow-y-auto">
+                    <div class="p-2">
+                        {% for recipient in recipients %}
+                        <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
+                            <div class="text-sm font-medium text-gray-700">{{ recipient.name }}</div>
+                            <div class="text-xs text-gray-500 ltr text-left">{{ recipient.phone }}</div>
+                            <div class="mt-1 flex items-center">
+                                <span class="text-xs text-gray-500">وضعیت پرداخت:</span>
+                                {% if recipient.payment_status == 'paid' %}
+                                <span class="mr-1 px-1 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">{{ recipient.get_payment_status_display }}</span>
+                                {% elif recipient.payment_status == 'pending' %}
+                                <span class="mr-1 px-1 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full">{{ recipient.get_payment_status_display }}</span>
+                                {% else %}
+                                <span class="mr-1 px-1 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">{{ recipient.get_payment_status_display }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="p-4 text-center text-gray-500">
+                            هیچ دریافت کننده‌ای یافت نشد.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

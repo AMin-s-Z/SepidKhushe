@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}سپید خوشه نقش جهان{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    {% load static %}
+    {% comment %} <link rel="stylesheet" href="{% static 'css/custom.css' %}"> {% endcomment %}
+
+    <style>
+        /* =================================== */
+        /* BASE & TYPOGRAPHY           */
+        /* =================================== */
+        :root {
+            --header-height: 80px;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: #fcfdff;
+            color: #374151; /* gray-700 */
+        }
+
+        /* =================================== */
+        /* PREMIUM BUTTON STYLES        */
+        /* =================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem; /* 12px 24px */
+            border-radius: 9999px; /* pill shape */
+            font-weight: 700;
+            border: 1px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            color: white;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2), 0 2px 5px rgba(34, 197, 94, 0.15);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(34, 197, 94, 0.25), 0 4px 8px rgba(34, 197, 94, 0.2);
+        }
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            color: #16a34a; /* green-700 */
+            background-color: transparent;
+            border-color: #a1a1aa; /* zinc-400 */
+        }
+        .btn-secondary:hover {
+            background-color: rgba(34, 197, 94, 0.05);
+            border-color: #16a34a;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem; /* 8px 16px */
+            font-size: 0.875rem; /* 14px */
+        }
+
+        .btn-lg {
+            padding: 1rem 2.5rem; /* 16px 40px */
+            font-size: 1.125rem; /* 18px */
+        }
+
+
+        /* =================================== */
+        /* MAIN HEADER             */
+        /* =================================== */
+        #main-header {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #main-header.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        .nav-link {
+            position: relative; font-weight: 600; transition: all 0.3s; padding: 0.5rem 1rem; border-radius: 0.5rem;
+        }
+        .nav-link:hover { color: #16a34a; background: rgba(34, 197, 94, 0.05); }
+        .nav-link.active { color: #16a34a; background: rgba(34, 197, 94, 0.1); }
+
+        /* Mobile Menu Enhancement */
+        #mobile-menu {
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+            overflow: hidden;
+        }
+        #mobile-menu.open { opacity: 1; }
+        #mobile-menu a {
+            opacity: 0; transform: translateX(15px); transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #mobile-menu.open a {
+            opacity: 1; transform: translateX(0);
+        }
+        /* Staggered animation for menu items */
+        #mobile-menu.open a:nth-child(1) { transition-delay: 0.1s; }
+        #mobile-menu.open a:nth-child(2) { transition-delay: 0.15s; }
+        #mobile-menu.open a:nth-child(3) { transition-delay: 0.2s; }
+        #mobile-menu.open a:nth-child(4) { transition-delay: 0.25s; }
+        #mobile-menu.open div { transition-delay: 0.3s; }
+
+        /* =================================== */
+        /* MESSAGE NOTIFICATIONS         */
+        /* =================================== */
+        #message-container { z-index: 100; }
+        .message-alert { animation: slideInRight 0.5s ease-out forwards; }
+        @keyframes slideInRight {
+            from { transform: translateX(110%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes shrink { from { width: 100%; } to { width: 0; } }
+
+        /* =================================== */
+        /* CUSTOM SCROLLBAR          */
+        /* =================================== */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #a1a1aa; border-radius: 5px; border: 2px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #71717a; }
+
+        /* =================================== */
+        /* LOADING SPINNER            */
+        /* =================================== */
+        .loading-spinner {
+            display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* =================================== */
+        /* PREMIUM FOOTER STYLES         */
+        /* =================================== */
+        #main-footer {
+            position: relative;
+            background-color: #111827; /* gray-900 */
+            overflow: hidden; /* Important for the glow effect */
+        }
+        /* Aurora Glow Effect */
+        #main-footer::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0) 50%);
+            animation: rotateGlow 20s linear infinite;
+            z-index: 0;
+        }
+        @keyframes rotateGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .footer-content {
+            position: relative;
+            z-index: 1;
+        }
+        .footer-title {
+            font-weight: 700;
+            font-size: 1.125rem; /* text-lg */
+            margin-bottom: 1.5rem; /* mb-6 */
+            color: white;
+        }
+        .footer-link {
+            color: #9ca3af; /* gray-400 */
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .footer-link:hover {
+            color: #10b981; /* green-500 */
+            transform: translateX(-4px);
+        }
+        .social-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem; /* rounded-xl */
+            color: #d1d5db; /* gray-300 */
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            color: white;
+            transform: translateY(-4px) scale(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .social-icon.instagram:hover { background-color: #e1306c; }
+        .social-icon.telegram:hover { background-color: #26a5e4; }
+        .social-icon.whatsapp:hover { background-color: #25d366; }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen">
+    <header id="main-header" class="sticky top-0 z-50">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center h-20">
+                <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+                    <div class="relative">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-600 rounded-full blur-md opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                        <div class="relative bg-gradient-to-br from-green-500 to-emerald-600 p-3 rounded-2xl transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 shadow-lg">
+                            <i class="fas fa-seedling text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-700 bg-clip-text text-transparent">سپید خوشه</h1>
+                        <p class="text-xs text-gray-500 font-medium">آموزش تخصصی پرورش قارچ</p>
+                    </div>
+                </a>
+
+                <nav class="hidden lg:flex items-center gap-2">
+                    <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">خانه</a>
+                    <a href="{% url 'home' %}#about" class="nav-link">درباره دوره</a>
+                    <a href="{% url 'track' %}" class="nav-link {% if request.resolver_match.url_name == 'track' %}active{% endif %}">پیگیری</a>
+
+                    <a href="{% url 'register' %}" class="btn btn-primary mr-4">
+                        <i class="fas fa-user-plus ml-2"></i>ثبت نام
+                    </a>
+                </nav>
+
+                <button id="mobile-menu-button" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <svg id="menu-open" class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg id="menu-close" class="w-6 h-6 text-gray-700 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="lg:hidden border-t border-gray-200 bg-white/95">
+            <div class="py-4 px-2 space-y-1">
+                <a href="{% url 'home' %}" class="block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-green-50 hover:text-green-700">خانه</a>
+                <a href="{% url 'home' %}#about" class="block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-green-50 hover:text-green-700">درباره دوره</a>
+
+                <a href="{% url 'track' %}" class="block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-green-50 hover:text-green-700">پیگیری ثبت نام</a>
+                <div class="pt-4 px-2">
+                    <a href="{% url 'register' %}" class="btn btn-primary w-full"><i class="fas fa-user-plus ml-2"></i>ثبت نام در دوره</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        {% if messages %}
+        <div id="message-container" class="fixed top-24 right-0 left-0 md:left-auto md:right-6 w-full md:w-96 px-4">
+            {% for message in messages %}
+            <div class="message-alert group relative overflow-hidden rounded-2xl shadow-2xl mb-4 transform transition-all duration-300 hover:scale-105">
+                <div class="absolute inset-0 bg-gradient-to-r {% if message.tags == 'success' %}from-green-400 to-emerald-500{% elif message.tags == 'error' %}from-red-400 to-rose-500{% elif message.tags == 'warning' %}from-yellow-400 to-amber-500{% else %}from-blue-400 to-indigo-500{% endif %}"></div>
+                <div class="relative p-4 flex items-center text-white">
+                    <div class="flex-shrink-0 ml-3">
+                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"><i class="fas {% if message.tags == 'success' %}fa-check{% elif message.tags == 'error' %}fa-times{% elif message.tags == 'warning' %}fa-exclamation{% else %}fa-info{% endif %} text-lg"></i></div>
+                    </div>
+                    <div class="flex-grow"><p class="font-bold text-sm">{{ message.tags|default:'اطلاع'|title }}</p><p class="text-sm opacity-90">{{ message }}</p></div>
+                    <button class="mr-2 opacity-70 hover:opacity-100" onclick="this.closest('.message-alert').style.transform='translateX(400px)'; setTimeout(()=>this.closest('.message-alert').remove(), 300);"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="absolute bottom-0 right-0 h-1 bg-white/30" style="animation: shrink 5s linear forwards;"></div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer id="main-footer">
+        <div class="footer-content container mx-auto px-6 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12">
+
+                <div class="lg:col-span-5 md:col-span-2">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="bg-gradient-to-br from-green-500 to-emerald-600 p-3 rounded-2xl shadow-lg">
+                            <i class="fas fa-seedling text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">سپید خوشه</h2>
+                            <p class="text-sm text-gray-400">نقش جهان</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed max-w-sm">
+                        ما به شما کمک می‌کنیم تا با دانش روز و به صورت عملی، هنر پرورش قارچ را بیاموزید و کسب‌وکار پایدار خود را بسازید.
+                    </p>
+                    <div class="flex items-center gap-4 mt-8">
+                        <a href="#" class="social-icon instagram" aria-label="Instagram">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="social-icon telegram" aria-label="Telegram">
+                            <i class="fab fa-telegram text-xl"></i>
+                        </a>
+                        <a href="#" class="social-icon whatsapp" aria-label="Whatsapp">
+                            <i class="fab fa-whatsapp text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 md:col-span-1">
+                    <h3 class="footer-title">دسترسی سریع</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="footer-link">خانه</a></li>
+                        <li><a href="#" class="footer-link">درباره دوره</a></li>
+                        <li><a href="#" class="footer-link">ثبت نام</a></li>
+                        <li><a href="#" class="footer-link">پیگیری</a></li>
+                    </ul>
+                </div>
+
+                <div class="lg:col-span-2 md:col-span-1">
+                    <h3 class="footer-title">خدمات ما</h3>
+                    <ul class="space-y-4 text-gray-400">
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i><span>آموزش جامع</span></li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i><span>مشاوره کسب‌وکار</span></li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i><span>پشتیبانی دائمی</span></li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i><span>مدرک معتبر</span></li>
+                    </ul>
+                </div>
+
+                <div class="lg:col-span-3 md:col-span-2">
+                    <h3 class="footer-title">تماس با ما</h3>
+                    <ul class="space-y-5">
+                        <li class="flex items-start gap-4">
+                            <i class="fas fa-map-marker-alt text-green-400 text-xl mt-1"></i>
+                            <span class="text-gray-400">اصفهان، خیابان پنج رمضان ، شرکت سپید خوشه نقش جهان</span>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <i class="fas fa-phone-alt text-green-400 text-xl mt-1"></i>
+                            <span class="text-gray-400 ltr">031-33386164</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="border-t border-gray-700/50 mt-12 pt-8 text-center">
+                <p class="text-gray-500 text-sm">&copy; {% now "Y" %} تمامی حقوق برای سپید خوشه نقش جهان محفوظ است.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button id="back-to-top" class="fixed bottom-6 right-6 bg-green-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-green-700 transform hover:scale-110 z-40">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({ duration: 800, once: true, offset: 100, });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Mobile Menu Toggle ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuOpenIcon = document.getElementById('menu-open');
+            const menuCloseIcon = document.getElementById('menu-close');
+
+            mobileMenuButton.addEventListener('click', () => {
+                const isOpen = mobileMenu.classList.toggle('open');
+                menuOpenIcon.classList.toggle('hidden', isOpen);
+                menuCloseIcon.classList.toggle('hidden', !isOpen);
+                if (isOpen) {
+                    mobileMenu.style.maxHeight = mobileMenu.scrollHeight + "px";
+                } else {
+                    mobileMenu.style.maxHeight = null;
+                }
+            });
+
+            // --- Header Scroll Effect ---
+            const header = document.getElementById('main-header');
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('scrolled', window.scrollY > 10);
+            });
+
+            // --- Back to Top Button ---
+            const backToTopButton = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                backToTopButton.classList.toggle('opacity-0', window.pageYOffset < 300);
+                backToTopButton.classList.toggle('invisible', window.pageYOffset < 300);
+            });
+            backToTopButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+            // --- Auto-dismiss Messages ---
+            document.querySelectorAll('.message-alert').forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                    alert.style.transform = 'translateX(110%)';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            });
+
+            // --- Newsletter Form Handler (REMOVED) ---
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

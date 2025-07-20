@@ -1,0 +1,445 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}داشبورد - سپید خوشه نقش جهان{% endblock %}
+
+{% block page_title %}داشبورد{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .revenue-card {
+        background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+        border-radius: 1rem;
+        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2), 0 4px 6px -2px rgba(16, 185, 129, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .revenue-card::before {
+        content: '';
+        position: absolute;
+        width: 210px;
+        height: 210px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -125px;
+        right: -15px;
+        z-index: 0;
+    }
+    
+    .revenue-card::after {
+        content: '';
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        bottom: -80px;
+        left: -70px;
+        z-index: 0;
+    }
+    
+    .progress-ring {
+        transform: rotate(-90deg);
+    }
+    
+    .progress-ring__circle {
+        stroke-dasharray: 283;
+        transition: stroke-dashoffset 0.5s ease;
+    }
+    
+    .table-container {
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    
+    .table-header {
+        background: linear-gradient(90deg, rgba(209, 250, 229, 0.5) 0%, rgba(236, 253, 245, 0.5) 100%);
+    }
+    
+    .table-row {
+        transition: all 0.2s;
+    }
+    
+    .table-row:hover {
+        background-color: rgba(236, 253, 245, 0.5);
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .status-badge i {
+        margin-left: 0.25rem;
+    }
+    
+    .status-badge.success {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: #065F46;
+    }
+    
+    .status-badge.warning {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: #92400E;
+    }
+    
+    .status-badge.danger {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #B91C1C;
+    }
+    
+    .payment-type-chart {
+        position: relative;
+        width: 140px;
+        height: 140px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Welcome Message -->
+<div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+    <div class="flex items-center">
+        <div class="bg-green-light p-4 rounded-full">
+            <i class="fas fa-leaf text-green-dark text-2xl"></i>
+        </div>
+        <div class="mr-4">
+            <h2 class="text-2xl font-bold text-gray-800">خوش آمدید به پنل مدیریت سپید خوشه نقش جهان</h2>
+            <p class="text-gray-600 mt-1">گزارش خلاصه ثبت نام‌ها و پرداخت‌های دوره آموزش پرورش قارچ</p>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="stat-card p-6">
+        <div class="flex justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">کل ثبت نام‌ها</p>
+                <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ total_registrations }}</h3>
+                <p class="text-sm text-green-primary mt-2 flex items-center">
+                    <i class="fas fa-chart-line ml-1"></i>
+                    <span>مشاهده جزئیات</span>
+                </p>
+            </div>
+            <div class="stat-icon bg-blue-50">
+                <i class="fas fa-users text-blue-500"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="stat-card p-6">
+        <div class="flex justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">پرداخت‌های موفق</p>
+                <h3 class="text-3xl font-bold text-green-primary mt-2">{{ paid_registrations }}</h3>
+                <p class="text-sm text-green-primary mt-2 flex items-center">
+                    <i class="fas fa-arrow-up ml-1"></i>
+                    <span>{{ paid_registrations|default:0|floatformat:0 }}% تکمیل شده</span>
+                </p>
+            </div>
+            <div class="stat-icon bg-green-light">
+                <i class="fas fa-check-circle text-green-dark"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="stat-card p-6">
+        <div class="flex justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">در انتظار پرداخت</p>
+                <h3 class="text-3xl font-bold text-amber-500 mt-2">{{ pending_registrations }}</h3>
+                <p class="text-sm text-amber-500 mt-2 flex items-center">
+                    <i class="fas fa-clock ml-1"></i>
+                    <span>نیازمند پیگیری</span>
+                </p>
+            </div>
+            <div class="stat-icon bg-amber-50">
+                <i class="fas fa-clock text-amber-500"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="stat-card p-6">
+        <div class="flex justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">پرداخت‌های ناموفق</p>
+                <h3 class="text-3xl font-bold text-red-500 mt-2">{{ failed_registrations }}</h3>
+                <p class="text-sm text-red-500 mt-2 flex items-center">
+                    <i class="fas fa-exclamation-circle ml-1"></i>
+                    <span>نیازمند بررسی</span>
+                </p>
+            </div>
+            <div class="stat-icon bg-red-50">
+                <i class="fas fa-times-circle text-red-500"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue & Payment Types -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="revenue-card p-6 lg:col-span-2">
+        <div class="relative z-10">
+            <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                <i class="fas fa-money-bill-wave ml-2"></i>
+                درآمد کل
+            </h3>
+            <div class="flex items-end">
+                <h2 class="text-4xl font-bold text-white">{{ total_revenue|floatformat:0 }}</h2>
+                <span class="text-green-light mr-2 mb-1">تومان</span>
+            </div>
+            <div class="mt-6 flex items-center">
+                <div class="bg-white/20 px-3 py-1 rounded-full text-white text-sm">
+                    <i class="fas fa-arrow-up mr-1"></i>
+                    <span>پرداخت‌های موفق: {{ paid_registrations }}</span>
+                </div>
+            </div>
+            
+            <div class="mt-6 grid grid-cols-2 gap-4">
+                <div class="bg-white/10 p-4 rounded-lg">
+                    <p class="text-green-light text-sm">پرداخت نقدی</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-white font-bold">{{ cash_payments }} نفر</span>
+                        <span class="text-white text-sm">{{ cash_payments|floatformat:0|default:0 }}%</span>
+                    </div>
+                    <div class="w-full bg-white/20 rounded-full h-2 mt-2">
+                        <div class="bg-white h-2 rounded-full" style="width: {% if total_registrations > 0 %}{{ cash_payments|floatformat:0|default:0 }}%{% else %}0%{% endif %}"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-white/10 p-4 rounded-lg">
+                    <p class="text-green-light text-sm">پرداخت اقساطی</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-white font-bold">{{ installment_payments }} نفر</span>
+                        <span class="text-white text-sm">{{ installment_payments|floatformat:0|default:0 }}%</span>
+                    </div>
+                    <div class="w-full bg-white/20 rounded-full h-2 mt-2">
+                        <div class="bg-white h-2 rounded-full" style="width: {% if total_registrations > 0 %}{{ installment_payments|floatformat:0|default:0 }}%{% else %}0%{% endif %}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+            <i class="fas fa-chart-pie text-green-primary ml-2"></i>
+            نوع پرداخت
+        </h3>
+        
+        <div class="flex justify-center">
+            <div class="payment-type-chart">
+                <svg class="progress-ring" width="140" height="140">
+                    <circle
+                        class="progress-ring__circle"
+                        stroke="#D1FAE5"
+                        stroke-width="12"
+                        fill="transparent"
+                        r="45"
+                        cx="70"
+                        cy="70"
+                        stroke-dashoffset="0"
+                    />
+                    <circle
+                        id="cash-progress"
+                        class="progress-ring__circle"
+                        stroke="#10B981"
+                        stroke-width="12"
+                        fill="transparent"
+                        r="45"
+                        cx="70"
+                        cy="70"
+                        stroke-dashoffset="283"
+                    />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-3xl font-bold text-gray-800">{{ total_registrations }}</span>
+                    <span class="text-sm text-gray-500">مجموع</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <span class="w-3 h-3 rounded-full bg-green-primary ml-2"></span>
+                    <span class="text-gray-700">نقدی</span>
+                </div>
+                <span class="font-bold">{{ cash_payments }} نفر</span>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <span class="w-3 h-3 rounded-full bg-green-light ml-2"></span>
+                    <span class="text-gray-700">اقساطی</span>
+                </div>
+                <span class="font-bold">{{ installment_payments }} نفر</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Registrations -->
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div class="p-6 flex justify-between items-center">
+        <h3 class="text-lg font-bold text-gray-800 flex items-center">
+            <i class="fas fa-clipboard-list text-green-primary ml-2"></i>
+            ثبت نام‌های اخیر
+        </h3>
+        <a href="{% url 'dashboard:registrations' %}" class="text-green-primary hover:text-green-dark flex items-center">
+            مشاهده همه
+            <i class="fas fa-arrow-left mr-1"></i>
+        </a>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead class="table-header">
+                <tr>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        نام
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        شماره تماس
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        نوع پرداخت
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        وضعیت
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        تاریخ
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        عملیات
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for registration in recent_registrations %}
+                    <tr class="table-row">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-light flex items-center justify-center text-green-dark font-bold">
+                                    {{ registration.name|slice:":1" }}
+                                </div>
+                                <div class="mr-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ registration.name }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500 flex items-center">
+                                <i class="fas fa-phone text-gray-400 ml-2"></i>
+                                {{ registration.phone }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">
+                                {% if registration.payment_type == 'cash' %}
+                                    <span class="flex items-center">
+                                        <i class="fas fa-money-bill text-green-primary ml-1"></i>
+                                        {{ registration.get_payment_type_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="flex items-center">
+                                        <i class="fas fa-credit-card text-blue-500 ml-1"></i>
+                                        {{ registration.get_payment_type_display }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if registration.payment_status == 'paid' %}
+                                <span class="status-badge success">
+                                    <i class="fas fa-check-circle"></i>
+                                    {{ registration.get_payment_status_display }}
+                                </span>
+                            {% elif registration.payment_status == 'pending' %}
+                                <span class="status-badge warning">
+                                    <i class="fas fa-clock"></i>
+                                    {{ registration.get_payment_status_display }}
+                                </span>
+                            {% else %}
+                                <span class="status-badge danger">
+                                    <i class="fas fa-times-circle"></i>
+                                    {{ registration.get_payment_status_display }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500 flex items-center">
+                                <i class="fas fa-calendar-alt text-gray-400 ml-2"></i>
+                                {{ registration.created_at|date:"Y/m/d H:i" }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{% url 'dashboard:registration_detail' registration.id %}" class="text-green-primary hover:text-green-dark flex items-center justify-end">
+                                <span>مشاهده</span>
+                                <i class="fas fa-eye mr-1"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-inbox text-gray-300 text-5xl mb-4"></i>
+                                <p>هنوز ثبت نامی انجام نشده است.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Calculate payment type percentages for the chart
+        const totalRegistrations = {{ total_registrations|default:0 }};
+        const cashPayments = {{ cash_payments|default:0 }};
+        
+        if (totalRegistrations > 0) {
+            const cashPercentage = (cashPayments / totalRegistrations) * 100;
+            const cashCircle = document.getElementById('cash-progress');
+            const circumference = 2 * Math.PI * 45;
+            const offset = circumference - (cashPercentage / 100) * circumference;
+            cashCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+            cashCircle.style.strokeDashoffset = offset;
+        }
+    });
+</script>
+{% endblock %} 

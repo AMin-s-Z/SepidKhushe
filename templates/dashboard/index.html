@@ -1,0 +1,251 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}داشبورد مدیریت{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">داشبورد مدیریت</h1>
+        <p class="text-gray-600">به سیستم مدیریت سپید خوشه نقش جهان خوش آمدید</p>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Registrations -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">کل ثبت نام ها</div>
+                        <div class="text-2xl font-bold text-gray-800">{{ total_registrations }}</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'dashboard:registrations' %}" class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+                        مشاهده همه
+                        <i class="fas fa-arrow-left mr-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Paid Registrations -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                        <i class="fas fa-check-circle text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">پرداخت شده</div>
+                        <div class="text-2xl font-bold text-gray-800">{{ paid_registrations }}</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'dashboard:registrations' %}?payment_status=paid" class="text-green-600 hover:text-green-800 text-sm flex items-center">
+                        مشاهده همه
+                        <i class="fas fa-arrow-left mr-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pending Registrations -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                        <i class="fas fa-clock text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">در انتظار پرداخت</div>
+                        <div class="text-2xl font-bold text-gray-800">{{ pending_registrations }}</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'dashboard:registrations' %}?payment_status=pending" class="text-yellow-600 hover:text-yellow-800 text-sm flex items-center">
+                        مشاهده همه
+                        <i class="fas fa-arrow-left mr-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Failed Registrations -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                        <i class="fas fa-times-circle text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">پرداخت ناموفق</div>
+                        <div class="text-2xl font-bold text-gray-800">{{ failed_registrations }}</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'dashboard:registrations' %}?payment_status=failed" class="text-red-600 hover:text-red-800 text-sm flex items-center">
+                        مشاهده همه
+                        <i class="fas fa-arrow-left mr-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h2 class="text-lg font-bold text-gray-700 mb-4">عملیات سریع</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="{% url 'dashboard:registrations' %}" class="bg-blue-50 hover:bg-blue-100 p-4 rounded-lg transition duration-300 flex items-center">
+                <div class="p-2 rounded-full bg-blue-100 text-blue-600 ml-3">
+                    <i class="fas fa-list"></i>
+                </div>
+                <div>
+                    <div class="font-medium text-gray-800">مدیریت ثبت نام ها</div>
+                    <div class="text-xs text-gray-500">مشاهده و مدیریت ثبت نام ها</div>
+                </div>
+            </a>
+            
+            <a href="{% url 'dashboard:payments' %}" class="bg-green-50 hover:bg-green-100 p-4 rounded-lg transition duration-300 flex items-center">
+                <div class="p-2 rounded-full bg-green-100 text-green-600 ml-3">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div>
+                    <div class="font-medium text-gray-800">مدیریت پرداخت ها</div>
+                    <div class="text-xs text-gray-500">مشاهده و بررسی پرداخت ها</div>
+                </div>
+            </a>
+            
+            <a href="{% url 'dashboard:message_create' %}" class="bg-purple-50 hover:bg-purple-100 p-4 rounded-lg transition duration-300 flex items-center">
+                <div class="p-2 rounded-full bg-purple-100 text-purple-600 ml-3">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div>
+                    <div class="font-medium text-gray-800">ارسال پیام</div>
+                    <div class="text-xs text-gray-500">ارسال پیام به ثبت نام کنندگان</div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Latest Registrations -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-blue-50 px-6 py-4">
+                <h2 class="text-lg font-bold text-gray-700">آخرین ثبت نام ها</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                نام و نام خانوادگی
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                شماره تماس
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                وضعیت پرداخت
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                تاریخ
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for registration in latest_registrations %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ registration.name }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 ltr text-left">{{ registration.phone }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if registration.payment_status == 'paid' %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    {{ registration.get_payment_status_display }}
+                                </span>
+                                {% elif registration.payment_status == 'pending' %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    {{ registration.get_payment_status_display }}
+                                </span>
+                                {% else %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    {{ registration.get_payment_status_display }}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ registration.registration_date|date:"Y/m/d" }}</div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                هیچ ثبت نامی یافت نشد.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Latest Payments -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-green-50 px-6 py-4">
+                <h2 class="text-lg font-bold text-gray-700">آخرین پرداخت ها</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                نام و نام خانوادگی
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                مبلغ
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                شناسه مرجع
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                تاریخ
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for payment in latest_payments %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ payment.registration.name }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-green-600">{{ payment.amount|floatformat:0 }} تومان</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 ltr text-left">{{ payment.ref_id|default:"-" }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ payment.payment_date|date:"Y/m/d" }}</div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                هیچ پرداختی یافت نشد.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
