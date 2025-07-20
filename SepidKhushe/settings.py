@@ -26,6 +26,9 @@ SECRET_KEY = "django-insecure-a+=59fgtgrxp8e#1!p@l)v80m(x2-hdch^8io4r4k+g!o+-9tb
 DEBUG = True
 
 ALLOWED_HOSTS = ["*","sepidkhushe.runflare.run"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://sepidkhushe.runflare.run",
+]
 
 
 # Application definition
