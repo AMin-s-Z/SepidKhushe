@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-a+=59fgtgrxp8e#1!p@l)v80m(x2-hdch^8io4r4k+g!o+-9tb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*",""]
+ALLOWED_HOSTS = ["*","sepidkhushe.runflare.run"]
 
 
 # Application definition
