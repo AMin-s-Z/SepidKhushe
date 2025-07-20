@@ -290,10 +290,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const paymentType = form.elements.payment_type.value;
         if (paymentType === 'cash') {
             document.getElementById('summary-payment_type').textContent = 'نقدی با تخفیف';
-            document.getElementById('summary-amount').innerHTML = '۱,۲۰۰,۰۰۰ <span class="text-sm font-normal">تومان</span>';
+            document.getElementById('summary-amount').innerHTML = '۴,۰۵۰,۰۰۰ <span class="text-sm font-normal">تومان</span>';
         } else if (paymentType === 'installment') {
             document.getElementById('summary-payment_type').textContent = 'اقساطی (پیش پرداخت)';
-            document.getElementById('summary-amount').innerHTML = '۵۰۰,۰۰۰ <span class="text-sm font-normal">تومان</span>';
+            document.getElementById('summary-amount').innerHTML = '۱,۵۰۰,۰۰۰ <span class="text-sm font-normal">تومان</span>';
         }
     }
 
